@@ -5,6 +5,10 @@ public enum Arena {
 	
 	int valorArena;
 	
+	public int getValorArena() {
+		return valorArena;
+	}
+
 	private Arena (int valor) {
 		this.valorArena = valor;
 	}
