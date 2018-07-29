@@ -9,7 +9,8 @@ public class Personagem extends Thread{
 	boolean atacarMesmoInimigo;
 	int mesmoInimigo;
 	int ataqueCobra, ataqueSanguessuga, infeccaoAlimentar, doencaInseto;
-	
+	boolean morto = false;
+	boolean recuperarHP = false;
 	Random rand = new Random();
 	
 	public Personagem (DadosPersonagem dados, ArrayList<DadosPersonagem> listaPersonagens, int arena) {
@@ -21,42 +22,56 @@ public class Personagem extends Thread{
 	public DadosPersonagem entrarEmCombate (ArrayList<DadosPersonagem> listaPersonagens) {
 		
 		boolean suaConfirmacao = false;
-		int valorAleatorio = 0;
-		while (!suaConfirmacao) {
-			 suaConfirmacao = personagem.iniciarBatalha();
-		}
-		
-		Random rand = new Random();
-		
 		boolean ConfirmacaoInimigo = false;
+		int valorAleatorio = 0;
+		
 		while (!ConfirmacaoInimigo) {
-			valorAleatorio = rand.nextInt(listaPersonagens.size());
-			
-			if (personagem.getPersonalidade() == Personalidade.ESTRATEGISTA.getValorPersonalidade()) {
-				if (atacarMesmoInimigo) {	
-					ConfirmacaoInimigo = listaPersonagens.get(mesmoInimigo).iniciarBatalha(); // ataca o mesmo inimigo
-					if (ConfirmacaoInimigo == false) {	// se falhar procura outro
-						atacarMesmoInimigo = false;
+			try {
+				personagem.encerrarBatalha();
+				Thread.sleep(rand.nextInt(501));
+				while (!suaConfirmacao && personagem.getHpAtual() > 0) {
+					 suaConfirmacao = personagem.iniciarBatalha();
+				}
+				
+				Random rand = new Random();
+				
+				valorAleatorio = rand.nextInt(listaPersonagens.size());
+				while (listaPersonagens.get(valorAleatorio).getNome().equals(personagem.getNome())	// enquanto for o mesmo personagem(não é possível atacar si mesmo) ou o personagem estiver morto
+						|| listaPersonagens.get(valorAleatorio).getHpAtual() == 0) {
+					valorAleatorio = rand.nextInt(listaPersonagens.size());
+				}
+				
+				if (personagem.getHpAtual() > 0 && suaConfirmacao) {
+					if (personagem.getPersonalidade() == Personalidade.ESTRATEGISTA.getValorPersonalidade()) {
+						if (atacarMesmoInimigo) {	
+							ConfirmacaoInimigo = listaPersonagens.get(mesmoInimigo).iniciarBatalha(); // ataca o mesmo inimigo
+							if (ConfirmacaoInimigo == false) {	// se falhar procura outro
+								atacarMesmoInimigo = false;
+							}
+						} else {
+							ConfirmacaoInimigo = listaPersonagens.get(valorAleatorio).iniciarBatalha();
+							if (ConfirmacaoInimigo && listaPersonagens.get(mesmoInimigo).getHpAtual() > 0 && listaPersonagens.get(mesmoInimigo).isDormindo()) { 	//Se atacar o inimigo ativa o ataque estratégico
+								atacarMesmoInimigo = true;
+								mesmoInimigo = valorAleatorio;
+							}
+						}
+					} else if (personagem.getPersonalidade() == Personalidade.ESPERTO.getValorPersonalidade()) {
+						if (listaPersonagens.get(valorAleatorio).getHpAtual() < personagem.getHpAtual()) {	//Ataca o inimigo somente quando tem vida menor
+							ConfirmacaoInimigo = listaPersonagens.get(valorAleatorio).iniciarBatalha();
+						}
+					} else if (personagem.getPersonalidade() == Personalidade.CORAJOSO.getValorPersonalidade()) {
+						if (listaPersonagens.get(valorAleatorio).isDormindo() == false) {	//Ataca o inimigo apenas quando está acordado
+							ConfirmacaoInimigo = listaPersonagens.get(valorAleatorio).iniciarBatalha();
+						}
+					} else {
+						ConfirmacaoInimigo = listaPersonagens.get(valorAleatorio).iniciarBatalha();
 					}
-				} else {
-					ConfirmacaoInimigo = listaPersonagens.get(valorAleatorio).iniciarBatalha();
-					if (ConfirmacaoInimigo && listaPersonagens.get(mesmoInimigo).getHpAtual() > 0 && listaPersonagens.get(mesmoInimigo).isDormindo()) { 	//Se atacar o inimigo ativa o ataque estratégico
-						atacarMesmoInimigo = true;
-						mesmoInimigo = valorAleatorio;
-					}
 				}
-			} else if (personagem.getPersonalidade() == Personalidade.ESPERTO.getValorPersonalidade()) {
-				if (listaPersonagens.get(valorAleatorio).getHpAtual() < personagem.getHpAtual()) {	//Ataca o inimigo somente quando tem vida menor
-					ConfirmacaoInimigo = listaPersonagens.get(valorAleatorio).iniciarBatalha();
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			} else if (personagem.getPersonalidade() == Personalidade.CORAJOSO.getValorPersonalidade()) {
-				if (listaPersonagens.get(valorAleatorio).isDormindo() == false) {	//Ataca o inimigo apenas quando está acordado
-					ConfirmacaoInimigo = listaPersonagens.get(valorAleatorio).iniciarBatalha();
-				}
-			} else {
-				ConfirmacaoInimigo = listaPersonagens.get(valorAleatorio).iniciarBatalha();
 			}
-		}
+		
 		
 		return listaPersonagens.get(valorAleatorio);
 	}
@@ -65,7 +80,7 @@ public class Personagem extends Thread{
 
 		boolean critico = false;
 		boolean passivaAssassino = false;
-		int danoFisico = atacante.getForça() * (1 - (inimigo.getDefFisica()/(inimigo.getDefFisica() + 100))); //(Força do Personagem * (1 - (defFísica do Inimigo / (defFísica do Inimigo + 100)))
+		int danoFisico = atacante.getForca() * (1 - (inimigo.getDefFisica()/(inimigo.getDefFisica() + 100))); //(Força do Personagem * (1 - (defFísica do Inimigo / (defFísica do Inimigo + 100)))
 		int danoMagico = atacante.getInteligencia() * (1 - (inimigo.getDefMagica()/(inimigo.getDefMagica() + 100))); 
 		int danoHibrido = (int)((danoFisico + danoMagico) * 0.5);
 		if ((rand.nextInt(100) + 1) > inimigo.getTaxaFuga()) {	// Se menor, o inimigo foge
@@ -102,6 +117,8 @@ public class Personagem extends Thread{
 							System.out.println(atacante.getNome() + " atacou sorrateiramente e causou " + danoFisico + " de dano físico à " + inimigo.getNome());
 						} else if (critico) {
 							System.out.println(atacante.getNome() + " atacou em um ponto CRÍTICO e causou " + danoFisico + " de dano físico à " + inimigo.getNome());
+						} else {
+							System.out.println(atacante.getNome() + " causou " + danoFisico + " de dano físico à " + inimigo.getNome());
 						}
 						
 					} else if (atacante.getRaca() == Raca.VAMPIRO.getValorRaca()
@@ -109,9 +126,16 @@ public class Personagem extends Thread{
 						
 						inimigo.setHpAtual(inimigo.getHpAtual() - danoMagico);
 						
+						
+						if (critico) {
+							System.out.println(atacante.getNome() + " atacou em um ponto CRÍTICO e causou " + danoMagico + " de dano mágico à " + inimigo.getNome());
+						} else {
+							System.out.println(atacante.getNome() + " causou " + danoMagico + " de dano mágico à " + inimigo.getNome());
+						}
+						
 						if (atacante.getRaca() == Raca.VAMPIRO.getValorRaca()) {
 							atacante.setHpAtual(atacante.getHpAtual() + (int)(danoMagico * 0.25));
-							System.out.println(atacante.getNome() + " sugou" + (int)(danoMagico * 0.25) + " de sangue de " + inimigo.getNome());
+							System.out.println(atacante.getNome() + " sugou " + (int)(danoMagico * 0.25) + " de sangue de " + inimigo.getNome());
 						}
 						
 					} else if (atacante.getRaca() == Raca.PALADINO.getValorRaca()
@@ -119,8 +143,18 @@ public class Personagem extends Thread{
 						
 						if (atacante.getRaca() == Raca.DRACONIANA.getValorRaca()) {
 							inimigo.setHpAtual(inimigo.getHpAtual() - 300);
+							
+							System.out.println(atacante.getNome() + " causou " + 300 + " de dano real à " + inimigo.getNome());
+							
 						} else {
 							inimigo.setHpAtual(inimigo.getHpAtual() - danoHibrido);
+							
+							if (critico) {
+								System.out.println(atacante.getNome() + " atacou em um ponto CRÍTICO e causou " + danoHibrido + " de dano híbrido  à " + inimigo.getNome());
+							} else {
+								System.out.println(atacante.getNome() + " causou " + danoHibrido + " de dano híbrido à " + inimigo.getNome());
+							}
+							
 						}
 					}
 					
@@ -139,23 +173,31 @@ public class Personagem extends Thread{
 			Thread.sleep(3000 + (personagem.getEnergiaTotal() * 500));	// 3s + (energia * 0.5s)
 			personagem.setDormindo(false);
 			personagem.setEnergiaAtual(personagem.getEnergiaTotal());	//recupera a energia
-			personagem.setHpAtual(personagem.getHpAtual() + (int)((personagem.getHpTotal() - personagem.getHpAtual()) * 0.1));	//Recupera 10% da vida perdida
-			if (personagem.getRaca() == Raca.ANAO.getValorRaca()) {
+			if (personagem.getRaca() == Raca.ANAO.getValorRaca() && personagem.getHpAtual() > 0) {
 				personagem.setEscudo(personagem.getEscudo() + 100);	//Recupera 100 do escudo do robô
 			} else if (personagem.getRaca() == Raca.MORTO_VIVO.getValorRaca()
 					&& personagem.getTurnosMortoVivo() > 0) {
 				personagem.setTurnosMortoVivo(personagem.getTurnosMortoVivo() - 1);
 			}
+			
+			recuperarHP = true;
+			
 		} catch (InterruptedException ex) {	
 		}
 	}
 	
 	@Override
 	public void run() {
-		while (!isInterrupted()) { 
+		while (!morto) { 
 			if(personagem.getHpAtual() > 0) { //Verifica se o personagem está morto
 				if (personagem.getEnergiaAtual() > 0) {
-					if(personagem.isEmCombate() == false) {//Verifica a energia do personagem
+					
+					if (recuperarHP && personagem.getHpAtual() > 0) {
+						personagem.setHpAtual(personagem.getHpAtual() + (int)((personagem.getHpTotal() - personagem.getHpAtual()) * 0.1));	//Recupera 10% da vida perdida
+						recuperarHP = false;
+					}
+					
+					if(personagem.isEmCombate() == false && personagem.getHpAtual() > 0) {//Verifica a energia do personagem
 						personagem.setEnergiaAtual(personagem.getEnergiaAtual() - 1); 	//Energia--
 						boolean continuaAtaque = true;
 						if (personagem.getPersonalidade() == Personalidade.INDECISO.getValorPersonalidade()) {
@@ -165,7 +207,7 @@ public class Personagem extends Thread{
 							}
 						}
 						
-						if (continuaAtaque) {
+						if (continuaAtaque && personagem.getHpAtual() > 0) {
 							//Perigos das arenas
 							if (arena == Arena.CAMPO_GLACIAL.getValorArena() ) {
 								if ((rand.nextInt(100) + 1) <= 5) { 	// 5% de chance morrer
@@ -258,9 +300,9 @@ public class Personagem extends Thread{
 							}
 							
 							//Calculo de dano dos perigos por turno da arena
-							if (continuaAtaque) {
+							if (continuaAtaque && personagem.getHpAtual() > 0) {
 								int dano;
-								if (ataqueCobra > 0) {
+								if (ataqueCobra > 0 && continuaAtaque) {
 									ataqueCobra--;
 									dano = rand.nextInt(51) + 100;
 									personagem.setHpAtual(personagem.getHpAtual() - dano);
@@ -270,7 +312,7 @@ public class Personagem extends Thread{
 										System.out.println(personagem.getNome() + " morreu envenenado");
 									}
 								}
-								if (ataqueSanguessuga > 0) {
+								if (ataqueSanguessuga > 0 && continuaAtaque) {
 									ataqueSanguessuga--;
 									dano = rand.nextInt(31) + 50;
 									personagem.setHpAtual(personagem.getHpAtual() - dano);
@@ -281,7 +323,7 @@ public class Personagem extends Thread{
 									}
 								}
 								
-								if (infeccaoAlimentar > 0) {
+								if (infeccaoAlimentar > 0 && continuaAtaque) {
 									infeccaoAlimentar--;
 									dano = rand.nextInt(71) + 80;
 									personagem.setHpAtual(personagem.getHpAtual() - dano);
@@ -292,7 +334,7 @@ public class Personagem extends Thread{
 									}
 								}
 								
-								if (doencaInseto > 0) {
+								if (doencaInseto > 0 && continuaAtaque) {
 									doencaInseto--;
 									dano = rand.nextInt(31) + 60;
 									personagem.setHpAtual(personagem.getHpAtual() - dano);
@@ -306,7 +348,7 @@ public class Personagem extends Thread{
 							
 							
 							//fase de ataque
-							if (continuaAtaque) {
+							if (continuaAtaque && personagem.getHpAtual() > 0) {
 								DadosPersonagem inimigo = entrarEmCombate(listaPersonagens);
 								atacar(personagem, inimigo);
 								
@@ -334,7 +376,15 @@ public class Personagem extends Thread{
 					}
 				}
 			} else {
-				Thread.currentThread().interrupt();
+				morto = true;
+				try {
+					Batalha.sem.acquire();
+					Batalha.morto();
+					Batalha.sem.release();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
 			}
 		}
 	}

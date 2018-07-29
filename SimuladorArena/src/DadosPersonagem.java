@@ -1,22 +1,20 @@
 import java.util.Random;
 
 public class DadosPersonagem {
-	
+
 	private boolean emCombate, passivaMortoVivo, dormindo;
 	private String nome;
-	private int hpTotal, hpAtual, forca, inteligencia, defFisica, defMagica,
-		energiaTotal, energiaAtual, velocidade, agilidade, raca, personalidade,
-		caractFisica, taxaFuga, taxaCritico, taxaResistencia,
-		taxaAcerto, taxaEsquiva, escudo, turnosMortoVivo;
-	
+	private int hpTotal, hpAtual, forca, inteligencia, defFisica, defMagica, energiaTotal, energiaAtual, velocidade,
+			agilidade, raca, personalidade, caractFisica, taxaFuga, taxaCritico, taxaResistencia, taxaAcerto,
+			taxaEsquiva, escudo, turnosMortoVivo;
+
 	/* Dados bônus */
-	private int hpBonus, forçaBonus, inteligenciaBonus, defFisicaBonus, defMagicaBonus,
-	energiaBonus, velocidadeBonus, agilidadeBonus, taxaFugaBonus, taxaCriticoBonus, taxaResistenciaBonus,
-	taxaAcertoBonus, taxaEsquivaBonus;
-	
+	private int hpBonus, forcaBonus, inteligenciaBonus, defFisicaBonus, defMagicaBonus, energiaBonus, velocidadeBonus,
+			agilidadeBonus, taxaFugaBonus, taxaCriticoBonus, taxaResistenciaBonus, taxaAcertoBonus, taxaEsquivaBonus;
+
 	Random rand = new Random();
-	
-	public DadosPersonagem (String nome, int arena) {
+
+	public DadosPersonagem(String nome, int arena) {
 		this.nome = nome;
 		this.setRaca(Raca.sortearRaca());
 		this.setPersonalidade(Personalidade.sortearPersonalidade());
@@ -24,89 +22,89 @@ public class DadosPersonagem {
 		this.bonusRaca();
 		this.bonusPersonalidade(arena);
 		this.gerarCaractFisica();
-		this.energiaAtual = 0;		//força o personagem a iniciar dormindo na arena
+		this.energiaAtual = 0; // força o personagem a iniciar dormindo na arena
 		this.hpAtual = hpTotal;
 	}
-	
+
 	private void gerarCaractFisica() {
 		if (this.caractFisica == CaractFisica.AGIL.getValorCaractFisica()) {
-			this.setHpTotal((rand.nextInt(201) + 600) * (1 + (hpBonus/100)));
-			this.setForça((rand.nextInt(41) + 80) * (1 + (forçaBonus/100)));
-			this.setInteligencia((rand.nextInt(41) + 170) * (1 + (inteligenciaBonus/100)));
-			this.setVelocidade((rand.nextInt(31) + 140) * (1 + (velocidadeBonus/100)));
-			this.setAgilidade((rand.nextInt(31) + 140) * (1 + (agilidadeBonus/100)));
-			this.setDefFisica((rand.nextInt(21) + 50 + (this.forca/10)) * (1 + (defFisicaBonus/100)));
-			this.setDefMagica((rand.nextInt(41) + 110 + (this.inteligencia/10)) * (1 + (defMagicaBonus/100)));
-			this.setEnergiaTotal(rand.nextInt(4) + 2 + (this.velocidade/80) + energiaBonus);
-			this.setTaxaFuga(rand.nextInt(16) + 10 + (this.velocidade/15) + taxaFugaBonus);
-			this.setTaxaCritico(rand.nextInt(16) + 20 + (this.agilidade/10) + taxaCriticoBonus);
-			this.setTaxaResistencia(rand.nextInt(8) + 5 + (this.forca/10) + taxaResistenciaBonus);
-			this.setTaxaAcerto(rand.nextInt(21) + 60 + (this.agilidade/10) + taxaAcertoBonus);
-			this.setTaxaEsquiva(rand.nextInt(16) + 25 + (this.agilidade/10) + taxaEsquivaBonus);
-			
+			this.setHpTotal((rand.nextInt(201) + 600) * (1 + (hpBonus / 100)));
+			this.setForca((rand.nextInt(41) + 80) * (1 + (forcaBonus / 100)));
+			this.setInteligencia((rand.nextInt(41) + 170) * (1 + (inteligenciaBonus / 100)));
+			this.setVelocidade((rand.nextInt(31) + 140) * (1 + (velocidadeBonus / 100)));
+			this.setAgilidade((rand.nextInt(31) + 140) * (1 + (agilidadeBonus / 100)));
+			this.setDefFisica((rand.nextInt(21) + 50 + (this.forca / 10)) * (1 + (defFisicaBonus / 100)));
+			this.setDefMagica((rand.nextInt(41) + 110 + (this.inteligencia / 10)) * (1 + (defMagicaBonus / 100)));
+			this.setEnergiaTotal(rand.nextInt(4) + 2 + (this.velocidade / 80) + energiaBonus);
+			this.setTaxaFuga(rand.nextInt(16) + 10 + (this.velocidade / 15) + taxaFugaBonus);
+			this.setTaxaCritico(rand.nextInt(16) + 20 + (this.agilidade / 10) + taxaCriticoBonus);
+			this.setTaxaResistencia(rand.nextInt(8) + 5 + (this.forca / 10) + taxaResistenciaBonus);
+			this.setTaxaAcerto(rand.nextInt(21) + 60 + (this.agilidade / 10) + taxaAcertoBonus);
+			this.setTaxaEsquiva(rand.nextInt(16) + 25 + (this.agilidade / 10) + taxaEsquivaBonus);
+
 		} else if (this.caractFisica == CaractFisica.MEDIANO.getValorCaractFisica()) {
-			this.setHpTotal((rand.nextInt(251) + 900) * (1 + (hpBonus/100)));
-			this.setForça((rand.nextInt(31) + 120) * (1 + (forçaBonus/100)));
-			this.setInteligencia((rand.nextInt(31) + 120) * (1 + (inteligenciaBonus/100)));
-			this.setVelocidade((rand.nextInt(31) + 90) * (1 + (velocidadeBonus/100)));
-			this.setAgilidade((rand.nextInt(21) + 110) * (1 + (agilidadeBonus/100)));
-			this.setDefFisica((rand.nextInt(21) + 70 + (this.forca/10)) * (1 + (defFisicaBonus/100)));
-			this.setDefMagica((rand.nextInt(21) + 70 + (this.inteligencia/10)) * (1 + (defMagicaBonus/100)));
-			this.setEnergiaTotal(rand.nextInt(4) + 1 + (this.velocidade/80) + energiaBonus);
-			this.setTaxaFuga(rand.nextInt(8) + 8 + (this.velocidade/15) + taxaFugaBonus);
-			this.setTaxaCritico(rand.nextInt(11) + 10 + (this.agilidade/10) + taxaCriticoBonus);
-			this.setTaxaResistencia(rand.nextInt(16) + 15 + (this.forca/10) + taxaResistenciaBonus);
-			this.setTaxaAcerto(rand.nextInt(21) + 50 + (this.agilidade/10) + taxaAcertoBonus);
-			this.setTaxaEsquiva(rand.nextInt(11) + 20 + (this.agilidade/10) + taxaEsquivaBonus);
-			
+			this.setHpTotal((rand.nextInt(251) + 900) * (1 + (hpBonus / 100)));
+			this.setForca((rand.nextInt(31) + 120) * (1 + (forcaBonus / 100)));
+			this.setInteligencia((rand.nextInt(31) + 120) * (1 + (inteligenciaBonus / 100)));
+			this.setVelocidade((rand.nextInt(31) + 90) * (1 + (velocidadeBonus / 100)));
+			this.setAgilidade((rand.nextInt(21) + 110) * (1 + (agilidadeBonus / 100)));
+			this.setDefFisica((rand.nextInt(21) + 70 + (this.forca / 10)) * (1 + (defFisicaBonus / 100)));
+			this.setDefMagica((rand.nextInt(21) + 70 + (this.inteligencia / 10)) * (1 + (defMagicaBonus / 100)));
+			this.setEnergiaTotal(rand.nextInt(4) + 1 + (this.velocidade / 80) + energiaBonus);
+			this.setTaxaFuga(rand.nextInt(8) + 8 + (this.velocidade / 15) + taxaFugaBonus);
+			this.setTaxaCritico(rand.nextInt(11) + 10 + (this.agilidade / 10) + taxaCriticoBonus);
+			this.setTaxaResistencia(rand.nextInt(16) + 15 + (this.forca / 10) + taxaResistenciaBonus);
+			this.setTaxaAcerto(rand.nextInt(21) + 50 + (this.agilidade / 10) + taxaAcertoBonus);
+			this.setTaxaEsquiva(rand.nextInt(11) + 20 + (this.agilidade / 10) + taxaEsquivaBonus);
+
 		} else if (this.caractFisica == CaractFisica.FORTE.getValorCaractFisica()) {
-			this.setHpTotal((rand.nextInt(401) + 1200) * (1 + (hpBonus/100)));
-			this.setForça((rand.nextInt(41) + 170) * (1 + (forçaBonus/100)));
-			this.setInteligencia((rand.nextInt(41) + 80) * (1 + (inteligenciaBonus/100)));
-			this.setVelocidade((rand.nextInt(21) + 70) * (1 + (velocidadeBonus/100)));
-			this.setAgilidade((rand.nextInt(21) + 80) * (1 + (agilidadeBonus/100)));
-			this.setDefFisica((rand.nextInt(41) + 110 + (this.forca/10)) * (1 + (defFisicaBonus/100)));
-			this.setDefMagica((rand.nextInt(21) + 50 + (this.inteligencia/10)) * (1 + (defMagicaBonus/100)));
-			this.setEnergiaTotal(rand.nextInt(3) + 1 + (this.velocidade/80) + energiaBonus);
-			this.setTaxaFuga(rand.nextInt(6) + 5 + (this.velocidade/15) + taxaFugaBonus);
-			this.setTaxaCritico(rand.nextInt(11) + 5 + (this.agilidade/10) + taxaCriticoBonus);
-			this.setTaxaResistencia(rand.nextInt(21) + 25 + (this.forca/10) + taxaResistenciaBonus);
-			this.setTaxaAcerto(rand.nextInt(16) + 45 + (this.agilidade/10) + taxaAcertoBonus);
-			this.setTaxaEsquiva(rand.nextInt(11) + 10 + (this.agilidade/10) + taxaEsquivaBonus);
+			this.setHpTotal((rand.nextInt(401) + 1200) * (1 + (hpBonus / 100)));
+			this.setForca((rand.nextInt(41) + 170) * (1 + (forcaBonus / 100)));
+			this.setInteligencia((rand.nextInt(41) + 80) * (1 + (inteligenciaBonus / 100)));
+			this.setVelocidade((rand.nextInt(21) + 70) * (1 + (velocidadeBonus / 100)));
+			this.setAgilidade((rand.nextInt(21) + 80) * (1 + (agilidadeBonus / 100)));
+			this.setDefFisica((rand.nextInt(41) + 110 + (this.forca / 10)) * (1 + (defFisicaBonus / 100)));
+			this.setDefMagica((rand.nextInt(21) + 50 + (this.inteligencia / 10)) * (1 + (defMagicaBonus / 100)));
+			this.setEnergiaTotal(rand.nextInt(3) + 1 + (this.velocidade / 80) + energiaBonus);
+			this.setTaxaFuga(rand.nextInt(6) + 5 + (this.velocidade / 15) + taxaFugaBonus);
+			this.setTaxaCritico(rand.nextInt(11) + 5 + (this.agilidade / 10) + taxaCriticoBonus);
+			this.setTaxaResistencia(rand.nextInt(21) + 25 + (this.forca / 10) + taxaResistenciaBonus);
+			this.setTaxaAcerto(rand.nextInt(16) + 45 + (this.agilidade / 10) + taxaAcertoBonus);
+			this.setTaxaEsquiva(rand.nextInt(11) + 10 + (this.agilidade / 10) + taxaEsquivaBonus);
 		}
 	}
-	
+
 	private void bonusRaca() {
 		if (this.raca == Raca.OGRO.getValorRaca()) {
 			this.hpBonus = 20;
-			this.forçaBonus = 25;
+			this.forcaBonus = 25;
 			this.defFisicaBonus = 15;
 			this.taxaResistenciaBonus = 15;
 			this.velocidadeBonus = -10;
 			this.agilidadeBonus = -10;
 			this.taxaAcertoBonus = -15;
 			this.taxaEsquivaBonus = -15;
-			
+
 		} else if (this.raca == Raca.ELFO.getValorRaca()) {
 			this.agilidadeBonus = 25;
 			this.taxaCriticoBonus = 35;
 			this.taxaAcertoBonus = 20;
 			this.taxaEsquivaBonus = 20;
 			this.hpBonus = -10;
-			this.forçaBonus = -10;
+			this.forcaBonus = -10;
 			this.defFisicaBonus = -10;
 			this.defMagicaBonus = -10;
-			
+
 		} else if (this.raca == Raca.ANAO.getValorRaca()) {
 			this.setEscudo(600);
-			this.forçaBonus = 15;
+			this.forcaBonus = 15;
 			this.defFisicaBonus = 20;
 			this.taxaAcertoBonus = 20;
 			this.velocidadeBonus = -15;
 			this.agilidadeBonus = -15;
 			this.taxaFugaBonus = -10;
 			this.taxaEsquivaBonus = -15;
-			
+
 		} else if (this.raca == Raca.ASSASSINO.getValorRaca()) {
 			this.velocidadeBonus = 25;
 			this.agilidadeBonus = 25;
@@ -115,7 +113,7 @@ public class DadosPersonagem {
 			this.taxaResistenciaBonus = -15;
 			this.defFisicaBonus = -15;
 			this.defMagicaBonus = -15;
-			
+
 		} else if (this.raca == Raca.VAMPIRO.getValorRaca()) {
 			this.hpBonus = 20;
 			this.taxaResistenciaBonus = 25;
@@ -123,30 +121,30 @@ public class DadosPersonagem {
 			this.defFisicaBonus = -10;
 			this.defMagicaBonus = -10;
 			this.taxaCriticoBonus = -15;
-			this.taxaAcertoBonus= -20;
-			
+			this.taxaAcertoBonus = -20;
+
 		} else if (this.raca == Raca.MORTO_VIVO.getValorRaca()) {
 			this.setPassivaMortoVivo(true);
-			this.forçaBonus = 20;
+			this.forcaBonus = 20;
 			this.taxaResistenciaBonus = 30;
 			this.defFisicaBonus = 15;
 			this.velocidadeBonus = -25;
 			this.agilidadeBonus = -25;
 			this.taxaAcertoBonus = -20;
 			this.taxaEsquivaBonus = -20;
-			
+
 		} else if (this.raca == Raca.MAGO.getValorRaca()) {
 			this.inteligenciaBonus = 30;
 			this.defMagicaBonus = 30;
 			this.taxaFugaBonus = 20;
 			this.taxaAcertoBonus = 30;
 			this.hpBonus = 15;
-			this.forçaBonus = -15;
+			this.forcaBonus = -15;
 			this.defFisicaBonus = -20;
 			this.taxaResistenciaBonus = -20;
-			
+
 		} else if (this.raca == Raca.PALADINO.getValorRaca()) {
-			this.forçaBonus = 15;
+			this.forcaBonus = 15;
 			this.inteligenciaBonus = 15;
 			this.defFisicaBonus = 15;
 			this.defMagicaBonus = 15;
@@ -154,7 +152,7 @@ public class DadosPersonagem {
 			this.velocidadeBonus = -15;
 			this.agilidadeBonus = -15;
 			this.taxaFugaBonus = -10;
-			
+
 		} else if (this.raca == Raca.DRACONIANA.getValorRaca()) {
 			this.hpBonus = 15;
 			this.defFisicaBonus = 15;
@@ -163,10 +161,10 @@ public class DadosPersonagem {
 			this.taxaFugaBonus = -10;
 			this.taxaCriticoBonus = -25;
 			this.taxaEsquivaBonus = -20;
-			
+
 		}
 	}
-	
+
 	private void bonusPersonalidade(int arena) {
 		if (this.personalidade == Personalidade.ADPTADOR.getValorPersonalidade()) {
 			if (arena == Arena.CAMPO_GLACIAL.getValorArena()) {
@@ -179,15 +177,15 @@ public class DadosPersonagem {
 			} else if (arena == Arena.SELVA.getValorArena()) {
 				this.taxaFugaBonus += 25;
 			}
-			
+
 		} else if (this.personalidade == Personalidade.DEFENSOR.getValorPersonalidade()) {
 			this.defFisicaBonus += 15;
 			this.defMagicaBonus += 15;
 		} else if (this.personalidade == Personalidade.MEDROSO.getValorPersonalidade()) {
 			this.taxaFugaBonus += 40;
-		} 
+		}
 	}
-	
+
 	public boolean isDormindo() {
 		return dormindo;
 	}
@@ -199,7 +197,7 @@ public class DadosPersonagem {
 	public boolean isPassivaMortoVivo() {
 		return passivaMortoVivo;
 	}
-	
+
 	public void setPassivaMortoVivo(boolean passivaMortoVivo) {
 		this.passivaMortoVivo = passivaMortoVivo;
 	}
@@ -219,7 +217,7 @@ public class DadosPersonagem {
 	public void setHpTotal(int hpTotal) {
 		this.hpTotal = hpTotal;
 	}
-	
+
 	public int getHpAtual() {
 		return hpAtual;
 	}
@@ -227,30 +225,32 @@ public class DadosPersonagem {
 	public void setHpAtual(int hpAtual) {
 		if (hpAtual > this.hpTotal) {
 			this.hpAtual = this.hpTotal;
-		} else if (hpAtual < 0) {
-			this.hpAtual = 0;
+		} else if (hpAtual <= 0) {
+			if (this.raca == Raca.MORTO_VIVO.getValorRaca()) {
+				if (this.hpAtual == 0 && passivaMortoVivo) {
+					this.setPassivaMortoVivo(false);
+					this.turnosMortoVivo = 2;
+					this.setHpAtual(1);
+					System.out.println(this.nome + " se tornou um morto vivo");
+				} else if (this.hpAtual == 0 && turnosMortoVivo > 0) {
+					this.setHpAtual(1);
+				} else {
+					this.hpAtual = 0;
+				}
+			} else {
+				this.hpAtual = 0;
+			}
 		} else {
 			this.hpAtual = hpAtual;
 		}
-		
-		if (this.raca == Raca.MORTO_VIVO.getValorRaca()) {
-			if (this.hpAtual  == 0 && passivaMortoVivo) {
-				this.setPassivaMortoVivo(false);
-				this.turnosMortoVivo = 2;
-				this.setHpAtual(1);
-				System.out.println(this.nome + " se tornou um morto vivo");
-			} else if (this.hpAtual == 0 && turnosMortoVivo > 0) {
-				this.setHpAtual(1);
-			}
-		}
 	}
 
-	public int getForça() {
+	public int getForca() {
 		return forca;
 	}
 
-	public void setForça(int força) {
-		this.forca = força;
+	public void setForca(int forca) {
+		this.forca = forca;
 	}
 
 	public int getInteligencia() {
@@ -284,7 +284,7 @@ public class DadosPersonagem {
 	public void setEnergiaTotal(int energiaTotal) {
 		this.energiaTotal = energiaTotal;
 	}
-	
+
 	public int getEnergiaAtual() {
 		return energiaAtual;
 	}
@@ -438,22 +438,23 @@ public class DadosPersonagem {
 		}
 		return false;
 	}
-	
+
 	synchronized public void encerrarBatalha() {
 		this.emCombate = false;
 	}
-	
+
 	public boolean isEmCombate() {
 		return emCombate;
 	}
 
 	@Override
 	public String toString() {
-		String texto = "Nome: " + this.nome + "\nHP: " + this.hpAtual + " / " + this.hpTotal + "\nEscudo: " + this.escudo + " / 600" 
-				+ "\nForça: " + this.forca + "\nInteligência: " + this.inteligencia + "\nDefesa Física: "
-				+ this.defFisica + "\nDefesa Mágica: " + this.defMagica + "\nEnergia: " + this.energiaAtual
-				+ " / " + this.energiaTotal + "\nVelocidade: " + this.velocidade + "\nAgilidade: " + this.agilidade;
-		
+		String texto = "Nome: " + this.nome + "\nHP: " + this.hpAtual + " / " + this.hpTotal + "\nEscudo: "
+				+ this.escudo + " / 600" + "\nForça: " + this.forca + "\nInteligência: " + this.inteligencia
+				+ "\nDefesa Física: " + this.defFisica + "\nDefesa Mágica: " + this.defMagica + "\nEnergia: "
+				+ this.energiaAtual + " / " + this.energiaTotal + "\nVelocidade: " + this.velocidade + "\nAgilidade: "
+				+ this.agilidade;
+
 		if (this.raca == Raca.OGRO.getValorRaca()) {
 			texto += "\nRaça: Ogro";
 		} else if (this.raca == Raca.ELFO.getValorRaca()) {
@@ -473,7 +474,7 @@ public class DadosPersonagem {
 		} else if (this.raca == Raca.DRACONIANA.getValorRaca()) {
 			texto += "\nRaça: Draconiana";
 		}
-		
+
 		if (this.personalidade == Personalidade.ADPTADOR.getValorPersonalidade()) {
 			texto += "\nPersonalidade: Adaptador";
 		} else if (this.personalidade == Personalidade.DEFENSOR.getValorPersonalidade()) {
@@ -491,7 +492,7 @@ public class DadosPersonagem {
 		} else if (this.personalidade == Personalidade.CORAJOSO.getValorPersonalidade()) {
 			texto += "\nPersonalidade: Corajoso";
 		}
-		
+
 		if (this.caractFisica == CaractFisica.AGIL.getValorCaractFisica()) {
 			texto += "\nCaracterístidca Física: Ágil";
 		} else if (this.caractFisica == CaractFisica.MEDIANO.getValorCaractFisica()) {
@@ -501,10 +502,19 @@ public class DadosPersonagem {
 		}
 		
 		texto += "\nTaxa de Fuga: " + this.taxaFuga + "%\nTaxa de Crítico: " + this.taxaCritico
-					+ "%\nTaxa de Resistência: " + this.taxaResistencia + "%\nTaxa de Acerto: "
-					+ this.taxaAcerto + "%\nTaxa de Esquiva: " + this.taxaEsquiva + "%";
+				+ "%\nTaxa de Resistência: " + this.taxaResistencia + "%\nTaxa de Acerto: " + this.taxaAcerto
+				+ "%\nTaxa de Esquiva: " + this.taxaEsquiva + "%";
+
+		if (this.raca == Raca.MORTO_VIVO.getValorRaca()) {
+			texto += "\nPassiva do Morto Vivo: ";
+			if (passivaMortoVivo) {
+				texto += "Não ativada";
+			} else {
+				texto += "Ativada";
+			}
+		}
 		
 		return texto;
 	}
-	
+
 }

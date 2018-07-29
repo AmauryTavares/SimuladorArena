@@ -1,19 +1,24 @@
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 
 public class Batalha extends Thread{
 	
 	int arena;
 	ArrayList<DadosPersonagem> listaDadosPersonagens;
 	ArrayList<Personagem> listaPersonagens;
+	int qtdPersonagens;
+	static int qtdMortos = 0;
+	static Semaphore sem = new Semaphore(1);
 	
 	Random rand = new Random();
 	
 	public Batalha (int qtd) {
-		arena = Arena.sortearArena();
+		this.arena = Arena.sortearArena();
 		listaDadosPersonagens = new ArrayList<>();
 		listaPersonagens = new ArrayList<>();
 		criarLista(qtd);
+		this.qtdPersonagens = qtd;
 	}
 	
 	private void criarLista(int tamanho) {
@@ -25,6 +30,14 @@ public class Batalha extends Thread{
 		}
 	}
 	
+	synchronized public static void morto() {
+		qtdMortos++;
+	}
+	
+	static public int getQtdMortos() {
+		return qtdMortos;
+	}
+			
 	private void iniciarBatalha () {
 		for (int i = 0; i < listaPersonagens.size(); i++) {
 			listaPersonagens.get(i).start();
@@ -34,23 +47,26 @@ public class Batalha extends Thread{
 	@Override
 	public void run() {
 		iniciarBatalha();
-		int contador = 999;
 		int vencedor = 0;
-		while (!isInterrupted()) {
-			if (contador > 1) {
-				//System.out.println("CONTADOR: " + contador);
-	
-				contador = 0;
-				for (int i = 0; i < listaPersonagens.size(); i++) {
-					if (listaDadosPersonagens.get(i).getHpAtual() > 0) {
-						contador += 1;
-						vencedor = i;
-					}
-				}
-			} else {
-				System.out.println(listaDadosPersonagens.get(vencedor).toString());
-				Thread.currentThread().interrupt();
+		while (qtdMortos != (qtdPersonagens - 1)) {
+			try {
+				Thread.sleep(500);
+				System.out.println("(TEMPORARIO) QUANTIDADE DE MORTOS: " + qtdMortos);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} 
+		
+		for (int i = 0; i < listaDadosPersonagens.size(); i++) {
+			if (listaDadosPersonagens.get(i).getHpAtual() > 0) {
+				vencedor = i;
 			}
 		}
+		
+		listaPersonagens.get(vencedor).interrupt();
+		
+		System.out.println("\n\n###################VENCEDOR###################\n\n" 
+	+ listaDadosPersonagens.get(vencedor).toString());		
+		
 	}
 }
