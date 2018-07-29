@@ -14,7 +14,7 @@ public enum Raca {
 		this.valorRaca = valor;
 	}
 	
-	static public int sortearPersonalidade() {
+	static public int sortearRaca() {
 		Random rand = new Random();
 		return (rand.nextInt(9) + 1);
 	}

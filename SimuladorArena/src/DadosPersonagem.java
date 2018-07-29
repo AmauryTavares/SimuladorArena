@@ -2,7 +2,7 @@ import java.util.Random;
 
 public class DadosPersonagem {
 	
-	private boolean emCombate, passivaMortoVivo;
+	private boolean emCombate, passivaMortoVivo, dormindo;
 	private String nome;
 	private int hpTotal, hpAtual, forca, inteligencia, defFisica, defMagica,
 		energiaTotal, energiaAtual, velocidade, agilidade, raca, personalidade,
@@ -18,9 +18,9 @@ public class DadosPersonagem {
 	
 	public DadosPersonagem (String nome, int arena) {
 		this.nome = nome;
-		this.setRaca(rand.nextInt(9) + 1);
-		this.setPersonalidade(rand.nextInt(8) + 1);
-		this.setCaractFisica(rand.nextInt(3) + 1);
+		this.setRaca(Raca.sortearRaca());
+		this.setPersonalidade(Personalidade.sortearPersonalidade());
+		this.setCaractFisica(CaractFisica.sortearCaractFisica());
 		this.bonusRaca();
 		this.bonusPersonalidade(arena);
 		this.gerarCaractFisica();
@@ -188,6 +188,14 @@ public class DadosPersonagem {
 		} 
 	}
 	
+	public boolean isDormindo() {
+		return dormindo;
+	}
+
+	public void setDormindo(boolean dormindo) {
+		this.dormindo = dormindo;
+	}
+
 	public boolean isPassivaMortoVivo() {
 		return passivaMortoVivo;
 	}
@@ -223,6 +231,17 @@ public class DadosPersonagem {
 			this.hpAtual = 0;
 		} else {
 			this.hpAtual = hpAtual;
+		}
+		
+		if (this.raca == Raca.MORTO_VIVO.getValorRaca()) {
+			if (this.hpAtual  == 0 && passivaMortoVivo) {
+				this.setPassivaMortoVivo(false);
+				this.turnosMortoVivo = 2;
+				this.setHpAtual(1);
+				System.out.println(this.nome + " se tornou um morto vivo");
+			} else if (this.hpAtual == 0 && turnosMortoVivo > 0) {
+				this.setHpAtual(1);
+			}
 		}
 	}
 
@@ -413,7 +432,7 @@ public class DadosPersonagem {
 	}
 
 	synchronized public boolean iniciarBatalha() {
-		if (!this.emCombate) {
+		if (!this.emCombate && this.hpAtual > 0) {
 			this.emCombate = true;
 			return true;
 		}
@@ -422,6 +441,10 @@ public class DadosPersonagem {
 	
 	synchronized public void encerrarBatalha() {
 		this.emCombate = false;
+	}
+	
+	public boolean isEmCombate() {
+		return emCombate;
 	}
 
 	@Override
