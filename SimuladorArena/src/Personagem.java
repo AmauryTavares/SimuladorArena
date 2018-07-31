@@ -5,6 +5,7 @@ public class Personagem extends Thread{
 	
 	DadosPersonagem personagem;
 	ArrayList<DadosPersonagem> listaPersonagens;
+	ArrayList<Personagem> listaPersonagensVivos;
 	int arena;
 	boolean atacarMesmoInimigo;
 	int mesmoInimigo;
@@ -13,9 +14,14 @@ public class Personagem extends Thread{
 	boolean recuperarHP = false;
 	Random rand = new Random();
 	
-	public Personagem (DadosPersonagem dados, ArrayList<DadosPersonagem> listaPersonagens, int arena) {
+	public void setMorto(boolean morto) {
+		this.morto = morto;
+	}
+	
+	public Personagem (DadosPersonagem dados, ArrayList<DadosPersonagem> listaPersonagens, ArrayList<Personagem> listaPersonagensVivos,  int arena) {
 		this.personagem = dados;
 		this.listaPersonagens = listaPersonagens;
+		this.listaPersonagensVivos = listaPersonagensVivos;
 		this.arena = arena;
 	}
 	
@@ -29,7 +35,20 @@ public class Personagem extends Thread{
 			try {
 				personagem.encerrarBatalha();
 				Thread.sleep(rand.nextInt(501));
+				int x = 0;
 				while (!suaConfirmacao && personagem.getHpAtual() > 0) {
+
+					try {
+						if (x != 50) {
+							Thread.sleep(100);
+							x++;
+						} else {
+							personagem.encerrarBatalha();
+						}
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					
 					 suaConfirmacao = personagem.iniciarBatalha();
 				}
 				
@@ -56,7 +75,13 @@ public class Personagem extends Thread{
 							}
 						}
 					} else if (personagem.getPersonalidade() == Personalidade.ESPERTO.getValorPersonalidade()) {
-						if (listaPersonagens.get(valorAleatorio).getHpAtual() < personagem.getHpAtual()) {	//Ataca o inimigo somente quando tem vida menor
+						int vivos = 0;
+						for (int i = 0; i < listaPersonagens.size(); i++) {
+							if (listaPersonagens.get(i).getHpAtual() > 0) {
+								vivos++;
+							}
+						}
+						if (listaPersonagens.get(valorAleatorio).getHpAtual() <= personagem.getHpAtual() || vivos <= 5) {	//Ataca o inimigo somente quando tem vida menor ou quando restam poucos vivos
 							ConfirmacaoInimigo = listaPersonagens.get(valorAleatorio).iniciarBatalha();
 						}
 					} else if (personagem.getPersonalidade() == Personalidade.CORAJOSO.getValorPersonalidade()) {
@@ -76,7 +101,7 @@ public class Personagem extends Thread{
 		return listaPersonagens.get(valorAleatorio);
 	}
 	
-	public void atacar (DadosPersonagem atacante, DadosPersonagem inimigo) {
+	public void atacar (DadosPersonagem atacante, DadosPersonagem inimigo,  ArrayList<Personagem> listaPersonagensVivos) {
 
 		boolean critico = false;
 		boolean passivaAssassino = false;
@@ -87,7 +112,7 @@ public class Personagem extends Thread{
 			
 			if (atacante.getRaca() == Raca.ASSASSINO.getValorRaca()) {
 				if (inimigo.isDormindo()) { 	//passiva 300% quando inimigo está dormindo
-					danoFisico = danoFisico * 2;
+					danoFisico = (int)(danoFisico * 1.5);
 					passivaAssassino = true;
 				} 
 			}
@@ -111,8 +136,16 @@ public class Personagem extends Thread{
 							|| atacante.getRaca() == Raca.ASSASSINO.getValorRaca()
 							|| atacante.getRaca() == Raca.MORTO_VIVO.getValorRaca()) {
 						
-						inimigo.setHpAtual(inimigo.getHpAtual() - danoFisico);
-	
+						if (inimigo.getRaca() == Raca.ANAO.getValorRaca()) {
+							int danoHP = inimigo.getEscudo() - danoFisico;
+							inimigo.setEscudo(inimigo.getEscudo() - danoFisico);
+							if (danoHP < 0) {
+								inimigo.setHpAtual(inimigo.getHpAtual() + danoHP);
+							}
+						} else {
+							inimigo.setHpAtual(inimigo.getHpAtual() - danoFisico);
+						}
+						
 						if (passivaAssassino) {
 							System.out.println(atacante.getNome() + " atacou sorrateiramente e causou " + danoFisico + " de dano físico à " + inimigo.getNome());
 						} else if (critico) {
@@ -124,8 +157,15 @@ public class Personagem extends Thread{
 					} else if (atacante.getRaca() == Raca.VAMPIRO.getValorRaca()
 							|| atacante.getRaca() == Raca.MAGO.getValorRaca()) {
 						
-						inimigo.setHpAtual(inimigo.getHpAtual() - danoMagico);
-						
+						if (inimigo.getRaca() == Raca.ANAO.getValorRaca()) {
+							int danoHP = inimigo.getEscudo() - danoMagico;
+							inimigo.setEscudo(inimigo.getEscudo() - danoMagico);
+							if (danoHP < 0) {
+								inimigo.setHpAtual(inimigo.getHpAtual() + danoHP);
+							}
+						} else {
+							inimigo.setHpAtual(inimigo.getHpAtual() - danoMagico);
+						}
 						
 						if (critico) {
 							System.out.println(atacante.getNome() + " atacou em um ponto CRÍTICO e causou " + danoMagico + " de dano mágico à " + inimigo.getNome());
@@ -147,7 +187,16 @@ public class Personagem extends Thread{
 							System.out.println(atacante.getNome() + " causou " + 300 + " de dano real à " + inimigo.getNome());
 							
 						} else {
-							inimigo.setHpAtual(inimigo.getHpAtual() - danoHibrido);
+							
+							if (inimigo.getRaca() == Raca.ANAO.getValorRaca()) {
+								int danoHP = inimigo.getEscudo() - danoHibrido;
+								inimigo.setEscudo(inimigo.getEscudo() - danoHibrido);
+								if (danoHP < 0) {
+									inimigo.setHpAtual(inimigo.getHpAtual() + danoHP);
+								}
+							} else {
+								inimigo.setHpAtual(inimigo.getHpAtual() - danoHibrido);
+							}
 							
 							if (critico) {
 								System.out.println(atacante.getNome() + " atacou em um ponto CRÍTICO e causou " + danoHibrido + " de dano híbrido  à " + inimigo.getNome());
@@ -160,6 +209,19 @@ public class Personagem extends Thread{
 					
 					if (inimigo.getHpAtual() == 0) {
 						System.out.println(atacante.getNome() + " matou " + inimigo.getNome());
+						try {
+							for (int i = 0; i < listaPersonagensVivos.size(); i++) {
+								if (listaPersonagensVivos.get(i).personagem.equals(inimigo)) {
+									listaPersonagensVivos.get(i).setMorto(true);
+									//listaPersonagensVivos.get(i).interrupt();
+								}
+							}
+							Batalha.sem.acquire();
+							Batalha.morto();
+							Batalha.sem.release();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 					
 				}
@@ -180,9 +242,14 @@ public class Personagem extends Thread{
 				personagem.setTurnosMortoVivo(personagem.getTurnosMortoVivo() - 1);
 			}
 			
+			if (!morto) {
+				System.out.println(personagem.getNome() + " acordou");
+			}
+						
 			recuperarHP = true;
 			
-		} catch (InterruptedException ex) {	
+		} catch (InterruptedException e) {	
+			e.printStackTrace();
 		}
 	}
 	
@@ -197,7 +264,22 @@ public class Personagem extends Thread{
 						recuperarHP = false;
 					}
 					
-					if(personagem.isEmCombate() == false && personagem.getHpAtual() > 0) {//Verifica a energia do personagem
+					int x = 0;
+					while (personagem.isEmCombate() && !morto) {
+						try {
+							if (x != 50) {
+								Thread.sleep(100);
+								x++;
+							} else {
+								personagem.encerrarBatalha();
+							}
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					
+					if(personagem.getHpAtual() > 0) {//Verifica a energia do personagem
 						personagem.setEnergiaAtual(personagem.getEnergiaAtual() - 1); 	//Energia--
 						boolean continuaAtaque = true;
 						if (personagem.getPersonalidade() == Personalidade.INDECISO.getValorPersonalidade()) {
@@ -345,15 +427,15 @@ public class Personagem extends Thread{
 									}
 								}
 							}
-							
-							
+
 							//fase de ataque
 							if (continuaAtaque && personagem.getHpAtual() > 0) {
+								
 								DadosPersonagem inimigo = entrarEmCombate(listaPersonagens);
-								atacar(personagem, inimigo);
+								atacar(personagem, inimigo, listaPersonagensVivos);
 								
 								if (inimigo.isDormindo() == false && inimigo.getHpAtual() > 0) {	//inimigo acordado e vivo
-									atacar(inimigo, personagem);
+									atacar(inimigo, personagem, listaPersonagensVivos);
 								}
 								
 								personagem.encerrarBatalha();
@@ -376,11 +458,12 @@ public class Personagem extends Thread{
 					}
 				}
 			} else {
-				morto = true;
 				try {
+					this.setMorto(true);
 					Batalha.sem.acquire();
 					Batalha.morto();
 					Batalha.sem.release();
+					this.interrupt();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

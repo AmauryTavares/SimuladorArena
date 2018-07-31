@@ -24,7 +24,7 @@ public class Batalha extends Thread{
 	private void criarLista(int tamanho) {
 		for (int i = 0; i < tamanho; i++) {
 			DadosPersonagem pDados = new DadosPersonagem("Personagem" + (i + 1), arena);
-			Personagem personagem = new Personagem(pDados, listaDadosPersonagens, arena);
+			Personagem personagem = new Personagem(pDados, listaDadosPersonagens, listaPersonagens, arena);
 			listaDadosPersonagens.add(pDados);
 			listaPersonagens.add(personagem);
 		}
@@ -41,32 +41,34 @@ public class Batalha extends Thread{
 	private void iniciarBatalha () {
 		for (int i = 0; i < listaPersonagens.size(); i++) {
 			listaPersonagens.get(i).start();
+			//System.out.println(listaPersonagens.get(i).personagem.toString());
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void run() {
 		iniciarBatalha();
 		int vencedor = 0;
 		while (qtdMortos != (qtdPersonagens - 1)) {
 			try {
-				Thread.sleep(500);
-				System.out.println("(TEMPORARIO) QUANTIDADE DE MORTOS: " + qtdMortos);
+				Thread.sleep(100);
+				//System.out.println("(TEMPORARIO) QUANTIDADE DE MORTOS: " + qtdMortos);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		} 
 		
 		for (int i = 0; i < listaDadosPersonagens.size(); i++) {
+			listaPersonagens.get(i).stop();
 			if (listaDadosPersonagens.get(i).getHpAtual() > 0) {
 				vencedor = i;
 			}
 		}
-		
-		listaPersonagens.get(vencedor).interrupt();
-		
+
 		System.out.println("\n\n###################VENCEDOR###################\n\n" 
 	+ listaDadosPersonagens.get(vencedor).toString());		
 		
 	}
+
 }

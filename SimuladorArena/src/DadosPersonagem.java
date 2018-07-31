@@ -517,4 +517,13 @@ public class DadosPersonagem {
 		return texto;
 	}
 
+	public boolean equals(DadosPersonagem obj) {
+		if (obj.getNome().equals(this.getNome())) {
+			return true;
+		}
+		return false;
+	}
+
+	
+	
 }
